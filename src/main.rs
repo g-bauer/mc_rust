@@ -4,10 +4,12 @@ use std::io::prelude::*;
 use std::fs::File;
 use rand::{Rng, SeedableRng, XorShiftRng};
 
-use my_vec::Vector3D;
 mod my_vec;
-use mymod::{energy, particle_energy, translate};
 mod mymod;
+mod potential;
+use potential::{LennardJones, Mie, system_energy};
+use my_vec::Vector3D;
+use mymod::{energy, particle_energy, translate};
 
 fn read_config(filename: String) -> Vec<Vector3D> {
     // let f = try!(File::open(filename));
@@ -68,6 +70,9 @@ fn main() {
     let cycles = 1000;
     let density = npart as f64/l.powi(3); // density
 
+    // introduce LJ potential
+    let potential = LennardJones::new(1f64, 1f64);
+    let mie = Mie::new(1f64, 1f64, 12i32, 6i32);
     // print some stuff to stdout
     println!("The system contains {} particles.", npart);
     println!("Density: {} / 1/sig^3", density);
@@ -78,7 +83,12 @@ fn main() {
     let mut buffer = BufWriter::new(File::create("output.dat").unwrap());
     // compute initial system energy
     let mut ener = energy(&particles, &l, &rc2);
+    // compute initial system energy via lj potential (as trait)
+    let ener2 = system_energy(&potential, &particles, &l, &rc2);
+    let ener_mie = system_energy(&mie, &particles, &l, &rc2);
     println!("Initial system energy: {}", ener);
+    println!("Initial system energy(trait): {}", ener2);
+    println!("Initial system energy(mie): {}", ener_mie);
     // start simulation
     for i in 0..cycles {
         for j in 0..moves {

@@ -9,7 +9,7 @@ fn lennard_jones(r2: &f64) -> f64 {
 }
 
 /// Compute squared distance between two positions including nearest image convention.
-fn squared_distance(r1: &Vector3D, r2: &Vector3D, l: &f64) -> f64 {
+pub fn squared_distance(r1: &Vector3D, r2: &Vector3D, l: &f64) -> f64 {
     let dx = (r1.0[0] - r2.0[0]) - ((r1.0[0] - r2.0[0])/l).round() *l;
     let dy = (r1.0[1] - r2.0[1]) - ((r1.0[1] - r2.0[1])/l).round() *l;
     let dz = (r1.0[2] - r2.0[2]) - ((r1.0[2] - r2.0[2])/l).round() *l;
